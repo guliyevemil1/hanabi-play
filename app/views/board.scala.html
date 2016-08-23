@@ -1,6 +1,7 @@
 @import _root_.model.Board
 @import _root_.model.Card
 @import _root_.model.HintedCard
+@import _root_.model.Hint
 @import _root_.model.Player
 @import _root_.model.Action
 @import _root_.model.Play
@@ -8,13 +9,14 @@
 @import _root_.model.GiveHint
 @import _root_.model.Color
 @import _root_.model.Color.Color
+@import _root_.model.Number.Number
 
 @(board : Board, me : Int)
 
 @makePile(color : Color) = {
     <div class="pile w3-@color">
         <p class="pile-value">
-            @{board.getPiles.get(color).getOrElse("0")}
+            @{board.getPiles.get(color).getOrElse(0)}
         </p>
     </div>
 }
@@ -38,20 +40,54 @@
     </div>
 }
 
-@makeAction(action : Action) = {
-
+@makePlayAction(p : Player, card : Card) = {
+    @p.name played @makeCard(card, "small-card")
 }
+
+@makeDiscardAction(p : Player, card : Card) = {
+    @p.name discarded @makeCard(card, "small-card")
+}
+
+@makeHintAction(p1 : Player, p2 : Player, hint : Either[Color, Number]) = {
+    @p1.name hinted @p2.name (@{hint.fold(_.toString, _.toString)})
+}
+
+@makeAction(action : Action) = {
+    @{ action match {
+        case Play(p, i) => makePlayAction(p, i)
+        case Discard(p, i) => makeDiscardAction(p, i)
+        case GiveHint(p1, p2, h) => makeHintAction(p1, p2, h)
+    }}
+}
+
+@makePlayerCard(player : Player, card : HintedCard) = {
+<td class="hinted-card-row">
+    @if(player.idx == me) {
+        <div class="w3-card w3-@card.getColor hanabi-card">
+
+            @if(card.getNumber == "0") {
+                <span style="visibility:hidden;">0</span>
+            } else {
+                <span>@card.getNumber</span>
+            }
+        </div>
+    } else {
+        @makeCard(card.card, "hanabi-card")
+    }
+</td>
+}
+
 
 @makeMyButton(player : Player, idx : Int) = {
 <form action="/" class="move" method="post">
     <input type="hidden" name="action" value="play">
     <input type="hidden" name="idx" value="@idx">
-    <button type="submit">Play</button>
+    <button type="submit" class="btn btn-primary btn-sm hanabi-btn">Play</button>
 </form>
 <form action="/" class="move" method="post">
     <input type="hidden" name="action" value="discard">
     <input type="hidden" name="idx" value="@idx">
-    <button type="submit">Discard</button>
+    <button type="submit" class="btn btn-primary btn-sm hanabi-btn">Discard</button>
 </form>
 }
 
@@ -60,13 +96,13 @@
     <input type="hidden" name="action" value="hintcolor">
     <input type="hidden" name="hintee" value="@player.idx">
     <input type="hidden" name="idx" value="@idx">
-    <button type="submit">Hint Color</button>
+    <button type="submit" class="btn btn-primary btn-sm hanabi-btn">Hint Color</button>
 </form>
 <form action="/" class="move" method="post">
     <input type="hidden" name="action" value="hintnumber">
     <input type="hidden" name="hintee" value="@player.idx">
     <input type="hidden" name="idx" value="@idx">
-    <button type="submit">Hint Number</button>
+    <button type="submit" class="btn btn-primary btn-sm hanabi-btn">Hint Number</button>
 </form>
 }
 
@@ -127,14 +163,14 @@
                                 <table class="hand">
                                     <tr>
                                         @for(card <- player.getHand) {
-                                            <td class="hinted-card-row">
-                                                @makeCard(card.card, "hanabi-card")
-                                            </td>
+                                            @makePlayerCard(player, card)
                                         }
                                    </tr>
+                                    @if(board.currentTurn == me) {
                                     <tr>
                                         @makeButtons(player)
                                     </tr>
+                                    }
                                     <tr>
                                         @for(card <- player.getHand) {
                                             <td class="hinted-card-row">

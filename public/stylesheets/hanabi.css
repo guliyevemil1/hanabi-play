@@ -22,6 +22,8 @@
 
 }
 
+form{ display: inline-block; }
+
 .w3-hanabi-black {
     color:#000!important;
     background-color:#000!important

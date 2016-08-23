@@ -45,7 +45,7 @@ class Board(playerCount : Int) {
   }
 
   def getDeckSize : Int = {
-    deck.size()
+    deck.size
   }
 
   def getHintCount : Int = {
@@ -58,6 +58,10 @@ class Board(playerCount : Int) {
 
   def getTurn : Int = {
     turn
+  }
+
+  def getDeck : List[Card] = {
+    deck.toList
   }
 
   private def cardCount() : Int = {
@@ -93,6 +97,7 @@ class Board(playerCount : Int) {
                   "post-deck-turns" -> JsNumber(postDeckTurns),
                   "piles" -> pilesToJson(),
                   "discard" -> JsArray(discarded.map(Json.toJson(_))),
+                  "deck" -> JsArray(deck.map(Json.toJson(_))),
                   "players" -> JsArray(showPlayers(playerIdx).map(Json.toJson(_))),
                   "history" -> JsArray(history.map(Json.toJson(_)))
                 ))
@@ -137,7 +142,7 @@ class Board(playerCount : Int) {
     override def writes(hintedCard : HintedCard) : JsValue = {
       Json.obj(
                 "card" -> Json.toJson(hintedCard.card),
-                "hints" -> hintedCard.hints.map(Json.toJson(_))
+                "hints" -> hintedCard.getHints.map(Json.toJson(_))
               )
     }
   }
@@ -174,7 +179,7 @@ class Board(playerCount : Int) {
     toJson(currentTurn).toString
   }
 
-  private def currentTurn : Int = {
+  def currentTurn : Int = {
     turn % playerCount
   }
 
@@ -183,7 +188,7 @@ class Board(playerCount : Int) {
   }
 
   private def updateTurn() : Unit = {
-    if (deck.empty()) {
+    if (deck.isEmpty) {
       postDeckTurns += 1
     }
     turn += 1
@@ -194,7 +199,7 @@ class Board(playerCount : Int) {
   }
 
   private def drawCard() : HintedCard = {
-    new HintedCard(deck.pop())
+    new HintedCard(deck.pop)
   }
 
   private def removeCardAndDraw(cardIndex : Int) : Card = {
@@ -292,7 +297,7 @@ class Board(playerCount : Int) {
         case HintType.Color => Left(hintedCard.card.color)
         case HintType.Number => Right(hintedCard.card.number)
       }
-      hintedCard.hints += Hint(hint == myValue, hint)
+      hintedCard.addHint(Hint(hint == myValue, hint))
     })
 
     history.push(GiveHint(currentPlayer, players(hintee), hint))

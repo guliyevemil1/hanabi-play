@@ -14,5 +14,5 @@ GET     /message                    controllers.AsyncController.message
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 GET     /board                          controllers.HanabiController.board
-GET     /board2                          controllers.HanabiController.board2
+GET     /board/:id                      controllers.HanabiController.board2(id : Int)
 POST    /move                           controllers.HanabiController.move

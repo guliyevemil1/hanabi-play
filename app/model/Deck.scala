@@ -1,14 +1,16 @@
 package model
 
-import java.util.Stack
-
+import scala.collection.mutable
 import scala.util.Random
 
 object Deck {
-  val cards: List[Card] = (for (c <- Color.values; i <- Number.nums) yield new Card(c, i)).toList;
-  def shuffledDeck : Stack[Card] = {
-    val deck = new Stack[Card]()
-    Random.shuffle(Deck.cards).foreach(deck.push)
-    deck
+  private def cards: mutable.Stack[Card] = {
+    val myCards = new mutable.Stack[Card]()
+    for (c <- Color.values; i <- Number.nums) yield { myCards.push(Card(c, i)) }
+    myCards
+  }
+
+  def shuffledDeck : mutable.Stack[Card] = {
+    Random.shuffle(Deck.cards)
   }
 }

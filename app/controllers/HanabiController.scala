@@ -2,8 +2,9 @@ package controllers
 
 import javax.inject._
 
+import model.HintType
 import model.HintType.HintType
-import model.{Board, HintType}
+import model.Board
 import play.api._
 import play.api.mvc._
 
@@ -26,8 +27,8 @@ class HanabiController extends Controller {
     Action {Ok(HanabiController.board.toString)}
   }
 
-  def board2 = {
-    Action {Ok(views.html.board(HanabiController.board, 0))}
+  def board2(id : Int) = {
+    Action {Ok(views.html.board(HanabiController.board, id))}
   }
 
   def play(m : Map[String, Seq[String]]) : Unit = {
