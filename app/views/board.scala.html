@@ -1,0 +1,195 @@
+@import _root_.model.Board
+@import _root_.model.Card
+@import _root_.model.HintedCard
+@import _root_.model.Player
+@import _root_.model.Action
+@import _root_.model.Play
+@import _root_.model.Discard
+@import _root_.model.GiveHint
+@import _root_.model.Color
+@import _root_.model.Color.Color
+
+@(board : Board, me : Int)
+
+@makePile(color : Color) = {
+    <div class="pile w3-@color">
+        <p class="pile-value">
+            @{board.getPiles.get(color).getOrElse("0")}
+        </p>
+    </div>
+}
+
+@makeCard(card : Card, classes : String) = {
+    <div class="w3-card w3-@card.color @classes">
+        @card.number
+    </div>
+}
+
+@makeStateValue(stateName : String, value : String) = {
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            @stateName
+        </div>
+        <div class="panel-body">
+            <p class="state-value">
+                @value
+            </p>
+        </div>
+    </div>
+}
+
+@makeAction(action : Action) = {
+
+}
+
+@makeMyButton(player : Player, idx : Int) = {
+<form action="/" class="move" method="post">
+    <input type="hidden" name="action" value="play">
+    <input type="hidden" name="idx" value="@idx">
+    <button type="submit">Play</button>
+</form>
+<form action="/" class="move" method="post">
+    <input type="hidden" name="action" value="discard">
+    <input type="hidden" name="idx" value="@idx">
+    <button type="submit">Discard</button>
+</form>
+}
+
+@makeTheirButton(player : Player, idx : Int) = {
+<form action="/" class="move" method="post">
+    <input type="hidden" name="action" value="hintcolor">
+    <input type="hidden" name="hintee" value="@player.idx">
+    <input type="hidden" name="idx" value="@idx">
+    <button type="submit">Hint Color</button>
+</form>
+<form action="/" class="move" method="post">
+    <input type="hidden" name="action" value="hintnumber">
+    <input type="hidden" name="hintee" value="@player.idx">
+    <input type="hidden" name="idx" value="@idx">
+    <button type="submit">Hint Number</button>
+</form>
+}
+
+@makeButtons(player : Player) = {
+    @for(i <- 0 until player.getHand.size) {
+        <td class='hinted-card-row' style>
+            <div class="btn-group hanabi-btn-group w3-show-inline-block">
+                @if(me == player.idx) {
+                    @makeMyButton(player, i)
+                } else {
+                    @makeTheirButton(player, i)
+                }
+            </div>
+        </td>
+    }
+}
+
+<html>
+<head>
+        <link rel="stylesheet" type="text/css" href="/assets/stylesheets/w3.css">
+        <link rel="stylesheet" type="text/css" href="/assets/stylesheets/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="/assets/stylesheets/hanabi.css">
+        <script src="/assets/javascripts/jquery-1.5.2.min.js" type="text/javascript"></script>
+        <script src="/assets/javascripts/hanabi.js" type="text/javascript"></script>
+        <script>
+            $(document).ready(function() {
+                $(".move").submit(function(event) {
+                    event.preventDefault();
+                    $.ajax({
+                        url : "/move",
+                        type : "POST",
+                        contentType : "application/x-www-form-urlencoded",
+                        data : $(this).serialize(),
+                        success : function() { location.reload(); }
+                    });
+                });
+             });
+        </script>
+</head>
+<body>
+        <div class="board">
+            <div class="w3-row piles">
+                <div class="w3-col-12">
+                    @for(color <- Color.values) {
+                        @makePile(color)
+                    }
+                </div>
+            </div>
+            
+            <div class="w3-row">
+                <div class="w3-col s10">
+                    @for(player <- board.getPlayers) {
+                        <div class="panel panel-default player">
+                            <div class="panel-heading">
+                                @player.name
+                            </div>
+                            <div class="panel-body">
+                                <table class="hand">
+                                    <tr>
+                                        @for(card <- player.getHand) {
+                                            <td class="hinted-card-row">
+                                                @makeCard(card.card, "hanabi-card")
+                                            </td>
+                                        }
+                                   </tr>
+                                    <tr>
+                                        @makeButtons(player)
+                                    </tr>
+                                    <tr>
+                                        @for(card <- player.getHand) {
+                                            <td class="hinted-card-row">
+                                                <div class="card-hints">
+                                                    <ul class="w3-ul w3-center">
+                                                        @for(hint <- card.getHints) {
+                                                            <li>
+                                                                @hint
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        }
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="panel panel-default discard-pile">
+                        <div class="panel-heading">
+                            Discarded cards
+                        </div>
+                        <div class="panel-body w3-center">
+                            @for(card <- board.getDiscarded.toList) {
+                                @makeCard(card, "hanabi-card discard-pile")
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w3-col s2">
+                    <div class="state">
+                        @makeStateValue("Cards in deck", board.getDeckSize.toString)
+                        @makeStateValue("Hints remaining", board.getHintCount.toString)
+                        @makeStateValue("Bombs remaining", board.getBombCount.toString)
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Previous moves
+                            </div>
+                            <div class="hanabi-history panel-body">
+                                <ul class="w3-ul">
+                                    @for(action <- board.getHistory) {
+                                        <li>
+                                            @makeAction(action)
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</body>
+</html>

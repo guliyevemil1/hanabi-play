@@ -1,0 +1,91 @@
+.hanabi-history {
+    max-height : 27%;
+    overflow : scroll;
+}
+
+.state {
+    margin : 0 10% 0 0;
+}
+
+.hinted-card-row {
+    text-align : center;
+    margin : auto;
+}
+
+.state-value {
+    text-align : center;
+    font-size : 24;
+    margin : auto;
+}
+
+.card-hints {
+
+}
+
+.w3-hanabi-black {
+    color:#000!important;
+    background-color:#000!important
+}
+
+.piles {
+    text-align : center;
+    margin: 10px 0 0 0;
+}
+
+.pile-value {
+    margin : auto;
+}
+
+.pile {
+    display : inline-block;
+    text-align : center;
+    width : 15%;
+    font-size : 36;
+    margin :2%;
+    border : 1px solid;
+}
+
+.hanabi-card {
+    display : inline-block;
+    font-size : 28;
+    padding : 0.8em 0.7em 0.8em 0.7em;
+    margin : 0 0 3% 0;
+}
+
+.small-card {
+    display : inline-block;
+    font-size : 12;
+    padding : 2px;
+}
+
+
+.hanabi-btn-group {
+    display : table;
+    margin : auto;
+}
+
+.hanabi-btn {
+}
+
+.player {
+    margin : 0 2% 2% 2%;
+}
+
+.player-name {
+    text-align : center;
+}
+
+.smallCard {
+    display : inline;
+    font-size : 12;
+    text-align : center;
+    border : 1px solid black;
+    padding-top : 2px;
+    padding-bottom : 2px;
+    padding-left : 2px;
+    padding-right : 2px;
+}
+
+.discard-pile {
+    margin : 2%;
+}
