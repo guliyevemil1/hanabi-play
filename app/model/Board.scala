@@ -8,8 +8,8 @@ import play.api.libs.json._
 
 import scala.collection.mutable.ListBuffer
 
-class Board(playerCount : Int) {
-  private val deck = Deck.shuffledDeck
+class Board(val playerCount : Int, val rainbow : Boolean) {
+  private val deck = Deck.shuffledDeck(rainbow)
 
   private val history = new mutable.Stack[Action]()
   private val discarded = new mutable.Stack[Card]()
@@ -142,7 +142,8 @@ class Board(playerCount : Int) {
     override def writes(hintedCard : HintedCard) : JsValue = {
       Json.obj(
                 "card" -> Json.toJson(hintedCard.card),
-                "hints" -> hintedCard.getHints.map(Json.toJson(_))
+                "color-hints" -> hintedCard.getColorHints.map(Json.toJson(_)),
+                "number-hints" -> hintedCard.getNumberHints.map(Json.toJson(_))
               )
     }
   }
@@ -299,6 +300,8 @@ class Board(playerCount : Int) {
       }
       hintedCard.addHint(Hint(hint == myValue, hint))
     })
+
+    removeHint()
 
     history.push(GiveHint(currentPlayer, players(hintee), hint))
 

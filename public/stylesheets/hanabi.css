@@ -22,12 +22,17 @@
 
 }
 
-form{ display: inline-block; }
-
-.w3-hanabi-black {
-    color:#000!important;
-    background-color:#000!important
+.w3-rainbow {
+    color:#ffffff!important;
+    text-shadow: 2px 2px 0px #000000;;
+    background: purple; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(red, yellow, green, blue, purple); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(red, yellow, green, blue, purple); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(red, yellow, green, blue, purple); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(red, yellow, green, blue, purple); /* Standard syntax */
 }
+
+form{ display: inline-block; }
 
 .piles {
     text-align : center;

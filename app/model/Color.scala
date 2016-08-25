@@ -7,4 +7,5 @@ object Color extends Enumeration {
   val Blue = Value("blue")
   val Yellow = Value("yellow")
   val White = Value("white")
+//  val Rainbow = Value("rainbow")
 }

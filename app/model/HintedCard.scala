@@ -4,74 +4,63 @@ import scala.collection.mutable
 import model.Color.Color
 import model.Number.Number
 
+import scala.collection.mutable.ListBuffer
+
 class HintedCard(val card : Card) {
-  var hints = new mutable.HashSet[Hint]()
-
-  private def justColorHints : mutable.HashSet[Hint] = {
-    hints.filter(_.hint.isLeft)
+  var colorHints = {
+    val allHints = new mutable.HashSet[Color]()
+    allHints ++= Color.values
+    allHints
   }
 
-  private def justNumberHints : mutable.HashSet[Hint] = {
-    hints.filter(_.hint.isRight)
+  var numberHints = {
+    val allHints = new mutable.HashSet[Number]()
+    allHints ++= Number.values
+    allHints
   }
 
-  def getColor : String = {
-    justColorHints.toList.find(_.is).map(_.hint.left.get.toString).getOrElse("black")
-  }
-
-  def getNumber : String = {
-    justNumberHints.toList.find(_.is).map(_.hint.right.get.toString).getOrElse("0")
-  }
-
-  private def negColorHints : Set[Hint] = {
-    justColorHints.toSet.filterNot(_.is)
-  }
-
-  private def negNumberHints : Set[Hint] = {
-    justNumberHints.toSet.filterNot(_.is)
-  }
-
-  private def findOtherColors : Set[Hint] = {
-    val s = negColorHints
-
-    if (s.size == 4) {
-      val colors : Set[Color] = Color.values -- s.map(_.hint.left.get)
-      colors.map(c => Hint(is = true, Left(c)))
-    } else {
-      s
-    }
-  }
-
-  private def findOtherNumbers : Set[Hint] = {
-    val s = negNumberHints
-
-    if (s.size == 4) {
-      val numbers : Set[Number] = Number.values -- s.map(_.hint.right.get)
-      numbers.map(c => Hint(is = true, Right(c)))
-    } else {
-      s
-    }
-  }
+  var hasColorHint = false
+  var hasNumberHint = false
 
   def addHint(hint : Hint): Unit = {
     if (hint.is) {
       if (hint.hint.isLeft) {
-        hints = justNumberHints
+        colorHints.clear()
+        colorHints += hint.hint.left.get
       } else {
-        hints = justColorHints
+        numberHints.clear()
+        numberHints += hint.hint.right.get
       }
-      hints += hint
     } else {
-      hints += hint
       if (hint.hint.isLeft) {
-        hints = justNumberHints ++findOtherColors
+        colorHints -= hint.hint.left.get
       } else {
-        hints = justColorHints ++findOtherNumbers
+        numberHints -= hint.hint.right.get
       }
     }
   }
 
-  def getHints : List[Hint] = {
-    hints.toList
+  def getColorHints : List[Hint] = {
+    colorHints.map(c => Hint(is = true, Left(c))).toList
+  }
+
+  def getNumberHints : List[Hint] = {
+    numberHints.toList.sortBy(_.id).map(n => Hint(is = true, Right(n)))
+  }
+
+  def getColor() : String = {
+    if (colorHints.size == 1) {
+      colorHints.head.toString
+    } else {
+      "black"
+    }
+  }
+
+  def getNumber() : String = {
+    if (numberHints.size == 1) {
+      numberHints.head.toString
+    } else {
+      "0"
+    }
   }
 }
