@@ -14,7 +14,7 @@ import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Promise}
 
 private object HanabiController {
-  val board : Board = new Board(2, false)
+  var board : Board = new Board(2, false)
 
   val ACTION : String = "action"
   val PLAY : String = "play"
@@ -44,6 +44,11 @@ class HanabiController @Inject() (implicit system: ActorSystem,
 
   def board = {
     Action {Ok(HanabiController.board.toString)}
+  }
+
+  def reset = {
+    HanabiController.board = new Board(2, false)
+    Action {Ok("")}
   }
 
   def boardHtml(id : Int) = {
