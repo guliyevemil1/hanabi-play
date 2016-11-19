@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
   cache,
   ws,
   filters,
-  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test
+  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test,
+  "com.google.api-client" % "google-api-client" % "1.22.0"
 )
 

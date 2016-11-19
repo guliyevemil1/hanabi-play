@@ -54,15 +54,15 @@
 }
 
 @makePlayAction(p : Player, card : Card) = {
-    @p.name played @makeCard(card, "small-card")
+    @p.getName played @makeCard(card, "small-card")
 }
 
 @makeDiscardAction(p : Player, card : Card) = {
-    @p.name discarded @makeCard(card, "small-card")
+    @p.getName discarded @makeCard(card, "small-card")
 }
 
 @makeHintAction(p1 : Player, p2 : Player, hint : Either[Color, Number]) = {
-    @p1.name hinted @p2.name (@{hint.fold(_.toString, _.toString)})
+    @p1.getName gave a hint to @p2.getName (@{hint.fold(_.toString, _.toString)})
 }
 
 @makeAction(action : Action) = {
@@ -90,27 +90,31 @@
 }
 
 
-@makeMyButton(player : Player, idx : Int) = {
+@makeMyButton(uuid : String, player : Player, idx : Int) = {
 <form action="/" class="move" method="post">
+    <input type="hidden" name="uuid" value="@uuid">
     <input type="hidden" name="action" value="play">
     <input type="hidden" name="idx" value="@idx">
     <button type="submit" class="btn btn-primary btn-sm hanabi-btn">Play</button>
 </form>
 <form action="/" class="move" method="post">
+    <input type="hidden" name="uuid" value="@uuid">
     <input type="hidden" name="action" value="discard">
     <input type="hidden" name="idx" value="@idx">
     <button type="submit" class="btn btn-primary btn-sm hanabi-btn">Discard</button>
 </form>
 }
 
-@makeTheirButton(player : Player, idx : Int) = {
+@makeTheirButton(uuid : String, player : Player, idx : Int) = {
 <form action="/" class="move" method="post">
+    <input type="hidden" name="uuid" value="@uuid">
     <input type="hidden" name="action" value="hintcolor">
     <input type="hidden" name="hintee" value="@player.idx">
     <input type="hidden" name="idx" value="@idx">
     <button type="submit" class="btn btn-primary btn-sm hanabi-btn">Hint Color</button>
 </form>
 <form action="/" class="move" method="post">
+    <input type="hidden" name="uuid" value="@uuid">
     <input type="hidden" name="action" value="hintnumber">
     <input type="hidden" name="hintee" value="@player.idx">
     <input type="hidden" name="idx" value="@idx">
@@ -118,14 +122,14 @@
 </form>
 }
 
-@makeButtons(player : Player) = {
+@makeButtons(uuid : String, player : Player) = {
     @for(i <- 0 until player.getHand.size) {
         <td class='hinted-card-row' style>
             <div class="btn-group hanabi-btn-group w3-show-inline-block">
                 @if(me == player.idx) {
-                    @makeMyButton(player, i)
+                    @makeMyButton(uuid, player, i)
                 } else {
-                    @makeTheirButton(player, i)
+                    @makeTheirButton(uuid, player, i)
                 }
             </div>
         </td>
@@ -146,7 +150,10 @@
            }
 
            $(document).ready(function() {
-                var exampleSocket = createWebSocket("/reload");
+                var exampleSocket = createWebSocket("/reload?uuid="
+                    + encodeURIComponent("@board.uuid")
+                    + "&idtoken="
+                    + encodeURIComponent("@board.players(me).user.idToken"));
 
                 exampleSocket.onopen = function (event) {
                   exampleSocket.send("");
@@ -185,7 +192,7 @@
                     @for(player <- board.getPlayers) {
                         <div class="panel panel-default player">
                             <div class="panel-heading">
-                                @player.name
+                                @player.getFullName
                             </div>
                             <div class="panel-body">
                                 <table class="hand">
@@ -196,7 +203,7 @@
                                    </tr>
                                     @if(board.currentTurn == me) {
                                     <tr>
-                                        @makeButtons(player)
+                                        @makeButtons(board.uuid, player)
                                     </tr>
                                     }
                                     <tr>

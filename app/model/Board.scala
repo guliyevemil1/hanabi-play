@@ -8,24 +8,38 @@ import play.api.libs.json._
 
 import scala.collection.mutable.ListBuffer
 
-class Board(val playerCount : Int, val rainbow : Boolean) {
+@SerialVersionUID(6822161743322278254L)
+class Board(val uuid : String, val users : ListBuffer[User], val rainbow : Boolean) extends Serializable {
   private val deck = Deck.shuffledDeck(rainbow)
 
   private val history = new mutable.Stack[Action]()
   private val discarded = new mutable.Stack[Card]()
   private val piles = new mutable.HashMap[Color, Number]()
   private var postDeckTurns = 0
+  private var playerIds = users.map(_.idToken)
+  private val playerCount = users.length
 
   private var turn : Int = 0
   private var bombs : Int = 3
   private var hints : Int = 8
 
-  private val players : List[Player] = {
+  val players : List[Player] = {
     val playersTmp = new ListBuffer[Player]()
-    for (i <- 0 until playerCount) {
-      playersTmp += newPlayer(i)
+    for (i <- users.indices) {
+      playersTmp += newPlayer(users(i), i)
     }
     playersTmp.toList
+  }
+
+  def getPlayerId(idToken : String) : Int = {
+    playerIds.indexOf(idToken)
+  }
+
+
+  def getPlayer(idToken : String) : Option[Player] = try {
+    Some(players(getPlayerId(idToken)))
+  } catch {
+    case _ : Throwable => None
   }
 
   def getPiles : Map[Color, Number] = {
@@ -65,7 +79,7 @@ class Board(val playerCount : Int, val rainbow : Boolean) {
   }
 
   private def cardCount() : Int = {
-    playerCount match {
+    users.length match {
       case 2 => 5
       case 3 => 5
       case 4 => 4
@@ -74,8 +88,8 @@ class Board(val playerCount : Int, val rainbow : Boolean) {
     }
   }
 
-  private def newPlayer(i : Int) : Player = {
-    val player : Player = new Player(i)
+  private def newPlayer(user : User, i : Int) : Player = {
+    val player : Player = new Player(user, i)
     (1 to cardCount) foreach { _ => player.hand += drawCard() }
     player
   }

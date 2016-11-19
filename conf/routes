@@ -5,16 +5,17 @@
 
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
-# An example controller showing how to use dependency injection
-GET     /count                      controllers.CountController.count
-# An example controller showing how to write asynchronous code
-GET     /message                    controllers.AsyncController.message
+GET     /signin                     controllers.HomeController.signin
+POST    /verify                     controllers.HomeController.verify
+GET     /create                     controllers.HomeController.createGame
+GET     /mainmenu                     controllers.HomeController.mainMenu
+GET     /start/:uuid                controllers.HomeController.startGame(uuid)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
-GET     /reset                          controllers.HanabiController.reset
-GET     /board/:id                      controllers.HanabiController.boardHtml(id : Int)
-POST    /move                           controllers.HanabiController.move
+GET     /board/:uuid                controllers.HomeController.boardHtml(uuid : String)
+GET     /boardlounge/:uuid                controllers.HomeController.boardLounge(uuid : String)
+POST    /move                           controllers.HomeController.move
 
-GET     /reload                         controllers.HanabiController.reload
+GET     /reload                         controllers.HomeController.reload

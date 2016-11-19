@@ -1,0 +1,19 @@
+@(count : Int, showStartButton : Boolean, gamelink : String)
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+Hey, you are on the board lounge, doo doo doo
+
+There are currently @count people in the lounge, whee!
+
+@if(showStartButton) {
+    <a href="@gamelink">Start game!</a>
+}
+</body>
+</html>
